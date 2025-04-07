@@ -13,7 +13,7 @@
     <div class="col-4">
         <div class="card">
             {% if article.photo %}
-            <img src="{{ article.photo.url }}" class="card-img-top" alt="...">
+            <img src="{{ article.photo.url }}" class="card-img-top" alt="..." style="height: 250px;">
             {% endif %}
             <div class="card-body">
                 <h5 class="card-title">{{ article.title }}</h5>
@@ -40,5 +40,6 @@
     </div>
     {% endfor %}
 
+    {% include './include/_pagination.html' %}
 </div>
 {% endblock content %}
