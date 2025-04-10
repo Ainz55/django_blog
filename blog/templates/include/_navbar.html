@@ -34,7 +34,7 @@
                 <a href="{% url 'login' %}" class="btn btn-success">Войти</a>
                 <a href="{% url 'registration' %}" class="btn btn-warning">Регистрация</a>
                 {% else %}
-                <a href="#" class="btn btn-danger">Выйти</a>
+                <a href="{% url 'logout' %}" class="btn btn-danger">Выйти</a>
                 {% endif %}
             </div>
 
