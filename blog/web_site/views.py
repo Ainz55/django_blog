@@ -1,9 +1,15 @@
 from django.shortcuts import render, HttpResponse, redirect
 from .models import Article, Category
 from django.core.paginator import Paginator
-from .forms import LoginForm, RegistrationForm
+from .forms import LoginForm, RegistrationForm, ArticleForm
 from django.contrib.auth import login, logout, authenticate
+from django.views.generic import DeleteView
 
+
+class ArticleDeleteView(DeleteView):
+    model = Article
+    template_name = 'web_site/article_confirm_delete.html'
+    success_url = '/'
 
 def home_view(request):
     articles = Article.objects.all()
@@ -69,3 +75,19 @@ def registration_view(request):
 def user_logout(request):
     logout(request)
     return redirect('home')
+
+
+def create_article(request):
+    if request.method == 'POST':
+        form = ArticleForm(data=request.POST, files=request.FILES)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.author = request.user
+            form.save()
+            return redirect('article_detail', form.pk)
+    else:
+        form = ArticleForm()
+    context = {
+        'form': form
+    }
+    return render(request, "web_site/article_form.html", context)

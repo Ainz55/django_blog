@@ -1,8 +1,34 @@
 from django import forms
-
 from django.contrib.auth.models import User
-
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from .models import Article
+
+
+class ArticleForm(forms.ModelForm):
+    class Meta:
+        model = Article
+        fields = ['title', 'short_description', 'full_description', 'photo',
+                  'category']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Введите название статьи'
+            }),
+            'short_description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Введите краткое описание статьи'
+            }),
+            'full_description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Введите полное описание статьи'
+            }),
+            'photo': forms.FileInput(attrs={
+                'class': 'form-control'
+            }),
+            'category': forms.Select(attrs={
+                'class': 'form-control'
+            })
+        }
 
 
 class LoginForm(AuthenticationForm):

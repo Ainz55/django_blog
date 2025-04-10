@@ -10,5 +10,8 @@ urlpatterns = [
          name="article_detail"),
     path('login/', views.login_view, name="login"),
     path('registration/', views.registration_view, name="registration"),
-    path('logout/', views.user_logout, name='logout')
+    path('logout/', views.user_logout, name='logout'),
+    path('article/create/', views.create_article, name='create'),
+    path('article/delete/<str:pk>/', views.ArticleDeleteView.as_view(),
+         name='delete')
 ]

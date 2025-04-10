@@ -11,10 +11,10 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                        aria-expanded="false">
-                        User
+                        {{ request.user.username }}
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Добавить статью</a></li>
+                        <li><a class="dropdown-item" href="{% url 'create' %}">Добавить статью</a></li>
                         <li><a class="dropdown-item" href="#">Мой профиль</a></li>
                         <li><a class="dropdown-item" href="#">Избранное</a></li>
                         <li>
