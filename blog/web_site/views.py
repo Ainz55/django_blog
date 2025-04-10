@@ -24,3 +24,19 @@ def category_articles(request, category_id):
         "articles": articles
     }
     return render(request, 'web_site/index.html', context)
+
+
+def article_detail(request, article_id):
+    article = Article.objects.get(pk=article_id)
+    context = {
+        "article": article
+    }
+    return render(request, 'web_site/article_detail.html', context)
+
+
+def login_view(request):
+    return render(request, "web_site/login.html")
+
+
+def registration_view(request):
+    return render(request, "web_site/registration.html")
