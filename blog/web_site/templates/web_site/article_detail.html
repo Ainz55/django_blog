@@ -31,7 +31,7 @@
         {% if request.user == article.author %}
         <div class="d-flex gap-2">
             <a href="{% url 'delete' article.pk %}" class="btn btn-danger">Удалить</a>
-            <a href="#" class="btn btn-warning">Изменить</a>
+            <a href="{% url 'update' article.pk %}" class="btn btn-warning">Изменить</a>
         </div>
         {% endif %}
 
@@ -42,5 +42,42 @@
         </div>
         {% endif %}
     </div>
+</div>
+
+<div class="mt-5">
+    <h2 class="text-center">Comments</h2>
+    {% if not request.user.is_authenticated %}
+    <p class="text-center">Only authorized users can leave comment. <a href="{% url 'login' %}">Login</a></p>
+    {% endif %}
+
+    <div class="comments d-flex flex-column row-gap-3 mb-4">
+        {% for comment in comments %}
+        <div class="card">
+            <div class="card-header text-end">
+                {{ comment.created_at }}
+            </div>
+            <div class="card-body">
+                <blockquote class="blockquote mb-0">
+                    <p>{{ comment.body }}</p>
+                    <footer class="blockquote-footer"><cite title="{{ comment.author }}">{{ comment.author }}</cite>
+                    </footer>
+                </blockquote>
+            </div>
+        </div>
+        {% empty %}
+        <h3 class="text-center border py-3 mt-5">No comments</h3>
+        {% endfor %}
+
+    </div>
+
+    {% if request.user.is_authenticated %}
+    <form action="" method="post">
+        {% csrf_token %}
+
+<!--        <textarea name="" id="" cols="30" rows="10" class="form-control"></textarea>-->
+        {{ form }}
+        <button class="btn btn-dark mt-3">Send</button>
+    </form>
+    {% endif %}
 </div>
 {% endblock %}

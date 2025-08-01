@@ -1,15 +1,25 @@
+from django.contrib.auth.models import User
 from django.shortcuts import render, HttpResponse, redirect
-from .models import Article, Category
+from .models import Article, Category, Comment, ArticleCountView
 from django.core.paginator import Paginator
-from .forms import LoginForm, RegistrationForm, ArticleForm
+
+from .forms import LoginForm, RegistrationForm, ArticleForm, CommentForm
 from django.contrib.auth import login, logout, authenticate
-from django.views.generic import DeleteView
+from django.views.generic import DeleteView, UpdateView
+
+
+class ArticleUpdateView(UpdateView):
+    model = Article
+    template_name = 'web_site/article_form.html'
+    form_class = ArticleForm
+    # success_url = '/'
 
 
 class ArticleDeleteView(DeleteView):
     model = Article
     template_name = 'web_site/article_confirm_delete.html'
     success_url = '/'
+
 
 def home_view(request):
     articles = Article.objects.all()
@@ -34,8 +44,44 @@ def category_articles(request, category_id):
 
 def article_detail(request, article_id):
     article = Article.objects.get(pk=article_id)
+
+    if not request.session.session_key:
+        request.session.save()
+
+    session_key = request.session.session_key
+
+    viewed_items = ArticleCountView.objects.filter(
+        article=article,
+        session_id=session_key
+    )
+
+    if viewed_items.count() == 0 and str(session_key) != "None":
+        viewed = ArticleCountView()
+        viewed.article = article
+        viewed.session_id = session_key
+        viewed.save()
+
+        article.views += 1
+        article.save()
+
+    if request.method == 'POST':
+        form = CommentForm(data=request.POST)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.article = article
+            form.author = request.user
+            form.save()
+            return redirect('article_detail', article.pk)
+    else:
+        form = CommentForm()
+
+    comments = article.comment_set.all()
+
+
     context = {
-        "article": article
+        "article": article,
+        "form": form,
+        "comments": comments
     }
     return render(request, 'web_site/article_detail.html', context)
 
@@ -91,3 +137,30 @@ def create_article(request):
         'form': form
     }
     return render(request, "web_site/article_form.html", context)
+
+
+def profile_view(request, username):
+    from datetime import datetime
+
+    user = User.objects.filter(username=username).first()
+    now_day = datetime.now().date()
+    joined_day = user.date_joined.date()
+    total = now_day - joined_day
+
+    articles = Article.objects.filter(author=user)
+    total_views = sum([article.views for article in articles])
+    total_comments = sum([article.comment_set.all().count() for article in articles])
+
+
+    context = {
+        'user': user,
+        'experience': total.days,
+        'total_views': total_views,
+        'total_comments': total_comments,
+        'articles': articles
+    }
+    return render(request, "web_site/profile.html", context)
+
+
+def add_like_or_dislike(request, obj_type, obj_id, action):
+    from django.shortcuts import get_object_or_404

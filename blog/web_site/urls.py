@@ -13,5 +13,10 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
     path('article/create/', views.create_article, name='create'),
     path('article/delete/<str:pk>/', views.ArticleDeleteView.as_view(),
-         name='delete')
+         name='delete'),
+    path('article/update/<str:pk>/', views.ArticleUpdateView.as_view(), name='update'),
+
+    path('profile/<str:username>/', views.profile_view, name='profile'),
+
+    path('<str:obj_type>/<int:obj_id>/<str:action>/', views.add_like_or_dislike, name='add_vote')
 ]

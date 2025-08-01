@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 # Create your models here.
 
@@ -29,6 +30,54 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return reverse('article_detail', kwargs={'article_id': self.pk})
+
     class Meta:
         verbose_name = "Статья"
         verbose_name_plural = "Статьи"
+        ordering = ['-created_at']
+
+
+class ArticleCountView(models.Model):
+    session_id = models.CharField(max_length=150)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, blank=True, null=True)
+
+
+class Comment(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    body = models.TextField()
+
+
+class Like(models.Model):
+    user = models.ManyToManyField(User, related_name="Likes")
+    article = models.OneToOneField(Article,
+                                   on_delete=models.CASCADE,
+                                   blank=True,
+                                   null=True,
+                                   related_name="Likes")
+    comment = models.OneToOneField(Comment,
+                                   on_delete=models.CASCADE,
+                                   blank=True,
+                                   null=True,
+                                   related_name="Likes")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class Dislike(models.Model):
+    user = models.ManyToManyField(User, related_name="dislikes")
+    article = models.OneToOneField(Article,
+                                   on_delete=models.CASCADE,
+                                   blank=True,
+                                   null=True,
+                                   related_name="dislikes")
+    comment = models.OneToOneField(Comment,
+                                   on_delete=models.CASCADE,
+                                   blank=True,
+                                   null=True,
+                                   related_name="dislikes")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
